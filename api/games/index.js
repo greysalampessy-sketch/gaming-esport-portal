@@ -2,13 +2,15 @@ const axios = require("axios");
 
 module.exports = async (req, res) => {
   try {
-    const { search = "", platforms = "" } = req.query;
+    const { search = "", platforms = "", page = "1", ordering = "" } = req.query;
 
     const response = await axios.get("https://api.rawg.io/api/games", {
       params: {
         key: process.env.RAWG_API_KEY,
         search: search || undefined,
         platforms: platforms || undefined,
+        ordering: ordering || undefined,
+        page: page || 1,
         page_size: 20,
       },
     });

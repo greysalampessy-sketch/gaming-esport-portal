@@ -9,10 +9,12 @@
 <body>
   <div class="topbar">
     <h1>Gaming & Esport Portal</h1>
-    <p>Katalog game live dari RAWG + jadwal pertandingan esport dari PandaScore</p>
+    <p>Katalog game live dari RAWG + jadwal, hasil, dan tim esport dari PandaScore</p>
     <div class="tabs">
       <button class="tab-btn active" data-tab="games">🎮 Katalog Game</button>
-      <button class="tab-btn" data-tab="esports">🏆 Esport</button>
+      <button class="tab-btn" data-tab="esports">🏆 Pertandingan</button>
+      <button class="tab-btn" data-tab="teams">🛡️ Tim Esport</button>
+      <button class="tab-btn" data-tab="favorites">⭐ Favorit</button>
     </div>
   </div>
 
@@ -23,6 +25,12 @@
         <div class="search-box">
           <input id="searchInput" type="text" placeholder="Cari game... (contoh: Mobile Legends, Valorant)" />
         </div>
+        <select id="sortSelect" class="sort-select">
+          <option value="">Urutkan: Relevansi</option>
+          <option value="-rating">Rating Tertinggi</option>
+          <option value="-released">Terbaru</option>
+          <option value="name">Nama A-Z</option>
+        </select>
       </div>
       <div class="chip-group" id="platformChips">
         <button class="chip active" data-platform="">Semua</button>
@@ -35,6 +43,9 @@
       </div>
       <p id="gamesStatus" class="status-text">Memuat data game...</p>
       <div id="gamesGrid" class="grid"></div>
+      <div class="load-more-wrap">
+        <button id="loadMoreBtn" class="load-more-btn">Muat Lebih Banyak</button>
+      </div>
     </div>
 
     <div id="esports-view" class="view">
@@ -45,12 +56,28 @@
         <button class="chip" data-game="valorant">Valorant</button>
       </div>
       <div class="chip-group" id="statusPills" style="margin-bottom:18px;">
-        <button class="chip active" data-status="upcoming">Mendatang</button>
-        <button class="chip" data-status="running">Sedang Berlangsung</button>
-        <button class="chip" data-status="past">Selesai</button>
+        <button class="chip" data-status="running">🔴 Sedang Berlangsung</button>
+        <button class="chip active" data-status="upcoming">📅 Mendatang</button>
+        <button class="chip" data-status="past">✅ Hasil Selesai</button>
       </div>
       <p id="matchesStatus" class="status-text">Memuat jadwal pertandingan...</p>
       <div id="matchesList" class="match-list"></div>
+    </div>
+
+    <div id="teams-view" class="view">
+      <div class="esport-pills" id="teamGamePills">
+        <button class="chip active" data-game="lol">League of Legends</button>
+        <button class="chip" data-game="dota2">Dota 2</button>
+        <button class="chip" data-game="csgo">CS:GO</button>
+        <button class="chip" data-game="valorant">Valorant</button>
+      </div>
+      <p id="teamsStatus" class="status-text">Memuat daftar tim...</p>
+      <div id="teamsGrid" class="team-grid"></div>
+    </div>
+
+    <div id="favorites-view" class="view">
+      <p id="favoritesStatus" class="status-text">Game favorit Anda</p>
+      <div id="favoritesGrid" class="grid"></div>
     </div>
 
   </div>

@@ -6,7 +6,8 @@ module.exports = async (req, res) => {
       headers: { Authorization: `Bearer ${process.env.PANDASCORE_API_KEY}` },
       params: { per_page: 100 },
     });
-    res.status(200).json(response.data);
+    const simplified = response.data.map(g => ({ id: g.id, name: g.name, slug: g.slug }));
+    res.status(200).json(simplified);
   } catch (error) {
     res.status(502).json({ error: error.response?.data || error.message });
   }

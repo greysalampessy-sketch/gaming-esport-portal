@@ -17,6 +17,10 @@ module.exports = async (req, res) => {
     res.status(200).json(response.data);
   } catch (error) {
     console.error("PandaScore error:", error.response?.data || error.message);
-    res.status(502).json({ error: "Gagal mengambil data pertandingan esport" });
+    res.status(502).json({
+      error: "Gagal mengambil data pertandingan esport",
+      detail: error.response?.data || error.message,
+      statusCode: error.response?.status || null,
+    });
   }
 };

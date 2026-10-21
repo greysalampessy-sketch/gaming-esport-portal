@@ -7,9 +7,9 @@ let currentSort = "";
 let currentPage = 1;
 let searchDebounce = null;
 
-let currentGame = "lol";
+let currentGame = "mlbb";
 let currentMatchStatus = "upcoming";
-let currentTeamGame = "lol";
+let currentTeamGame = "mlbb";
 
 function escapeHtml(str = "") {
   return String(str).replace(/[&<>"']/g, (c) => ({
@@ -362,3 +362,4 @@ async function loadTeams() {
 
 loadGames(false);
 loadMatches();
+

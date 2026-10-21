@@ -4,10 +4,10 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>ESPORT SGA - Portal Resmi Game & Esport Indonesia</title>
-  <meta name="description" content="ESPORT SGA adalah portal resmi informasi katalog game, jadwal pertandingan, hasil skor, dan profil tim esport terlengkap untuk komunitas gaming Indonesia." />
-  <meta name="keywords" content="esport sga, portal esport, jadwal esport, hasil pertandingan esport, katalog game, tim esport, mobile legends, valorant, dota 2, csgo" />
+  <meta name="description" content="ESPORT SGA adalah portal resmi informasi katalog game, jadwal pertandingan Mobile Legends, PUBG, Valorant, hasil skor, dan profil tim esport terlengkap untuk komunitas gaming Indonesia." />
+  <meta name="keywords" content="esport sga, portal esport indonesia, jadwal mobile legends, mpl indonesia, jadwal esport, hasil pertandingan esport, katalog game, tim esport, mobile legends, valorant, pubg, dota 2" />
   <meta property="og:title" content="ESPORT SGA - Portal Resmi Game & Esport Indonesia" />
-  <meta property="og:description" content="Katalog game, jadwal pertandingan, hasil skor live, dan profil tim esport terlengkap dalam satu platform." />
+  <meta property="og:description" content="Katalog game, jadwal pertandingan Mobile Legends & PUBG, hasil skor live, dan profil tim esport terlengkap dalam satu platform." />
   <meta property="og:type" content="website" />
   <link rel="stylesheet" href="style.css" />
   <link rel="icon" type="image/x-icon" href="favicon.ico" />
@@ -18,7 +18,7 @@
 <body>
   <div class="topbar">
     <img src="logo-wordmark.png" alt="ESPORT SGA" class="brand-logo" />
-    <p>Portal resmi katalog game, jadwal pertandingan, hasil skor, dan profil tim esport terpercaya</p>
+    <p>Portal resmi katalog game, jadwal pertandingan, hasil skor, dan profil tim esport untuk komunitas gaming Indonesia</p>
     <div class="tabs">
       <button class="tab-btn active" data-tab="games">🎮 Katalog Game</button>
       <button class="tab-btn" data-tab="esports">🏆 Pertandingan</button>
@@ -59,11 +59,12 @@
 
     <div id="esports-view" class="view">
       <div class="esport-pills" id="gamePills">
-        <button class="chip active" data-game="lol">League of Legends</button>
-        <button class="chip" data-game="dota2">Dota 2</button>
-        <button class="chip" data-game="csgo">CS:GO</button>
+        <button class="chip active" data-game="mlbb">Mobile Legends: Bang Bang</button>
+        <button class="chip" data-game="pubg">PUBG</button>
         <button class="chip" data-game="valorant">Valorant</button>
-        <button class="chip" data-game="mlbb">Mobile Legends: Bang Bang</button>
+        <button class="chip" data-game="lol-wild-rift">LoL: Wild Rift</button>
+        <button class="chip" data-game="dota-2">Dota 2</button>
+        <button class="chip" data-game="cs-go">Counter-Strike</button>
       </div>
       <div class="chip-group" id="statusPills" style="margin-bottom:18px;">
         <button class="chip" data-status="running">🔴 Sedang Berlangsung</button>
@@ -76,11 +77,12 @@
 
     <div id="teams-view" class="view">
       <div class="esport-pills" id="teamGamePills">
-        <button class="chip active" data-game="lol">League of Legends</button>
-        <button class="chip" data-game="dota2">Dota 2</button>
-        <button class="chip" data-game="csgo">CS:GO</button>
+        <button class="chip active" data-game="mlbb">Mobile Legends: Bang Bang</button>
+        <button class="chip" data-game="pubg">PUBG</button>
         <button class="chip" data-game="valorant">Valorant</button>
-        <button class="chip" data-game="mlbb">Mobile Legends: Bang Bang</button>
+        <button class="chip" data-game="lol-wild-rift">LoL: Wild Rift</button>
+        <button class="chip" data-game="dota-2">Dota 2</button>
+        <button class="chip" data-game="cs-go">Counter-Strike</button>
       </div>
       <p id="teamsStatus" class="status-text">Memuat daftar tim...</p>
       <div id="teamsGrid" class="team-grid"></div>
@@ -114,6 +116,3 @@
   <script src="app.js"></script>
 </body>
 </html>
-
-
-

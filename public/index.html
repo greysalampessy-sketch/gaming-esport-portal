@@ -3,50 +3,74 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Demo Gaming & Esport Portal</title>
-  <style>
-    body { font-family: Arial, sans-serif; background: #0f1117; color: #f0f0f0; margin: 0; padding: 24px; }
-    h1 { font-size: 22px; margin-bottom: 4px; }
-    .subtitle { color: #9aa0ac; margin-bottom: 24px; }
-    .section { margin-bottom: 32px; }
-    .section h2 { font-size: 18px; border-left: 4px solid #4f8cff; padding-left: 8px; }
-    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 12px; }
-    .card { background: #1a1d27; border-radius: 10px; overflow: hidden; }
-    .card img { width: 100%; height: 100px; object-fit: cover; display: block; }
-    .card .info { padding: 8px; }
-    .card .info h3 { font-size: 14px; margin: 0 0 4px; }
-    .card .info p { font-size: 12px; color: #9aa0ac; margin: 0; }
-    select, input { background: #1a1d27; color: #f0f0f0; border: 1px solid #333; padding: 6px 10px; border-radius: 6px; margin-right: 8px; }
-    .match-row { display: flex; justify-content: space-between; padding: 10px; background: #1a1d27; border-radius: 8px; margin-bottom: 8px; font-size: 14px; }
-    .loading { color: #9aa0ac; font-size: 13px; }
-  </style>
+  <title>Gaming & Esport Portal</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <h1>Demo Gaming & Esport Portal</h1>
-  <p class="subtitle">Contoh integrasi API gratis: RAWG (katalog game) + PandaScore (jadwal esport) - deploy di Vercel</p>
-
-  <div class="section">
-    <h2>Katalog Game</h2>
-    <div>
-      <input id="searchInput" type="text" placeholder="Cari game (contoh: Mobile Legends)" />
-      <button id="searchBtn">Cari</button>
+  <div class="topbar">
+    <h1>Gaming & Esport Portal</h1>
+    <p>Katalog game live dari RAWG + jadwal pertandingan esport dari PandaScore</p>
+    <div class="tabs">
+      <button class="tab-btn active" data-tab="games">🎮 Katalog Game</button>
+      <button class="tab-btn" data-tab="esports">🏆 Esport</button>
     </div>
-    <div id="gamesStatus" class="loading">Memuat data game...</div>
-    <div id="gamesGrid" class="grid"></div>
   </div>
 
-  <div class="section">
-    <h2>Jadwal Pertandingan Esport</h2>
-    <div>
-      <select id="gameSelect">
-        <option value="lol">League of Legends</option>
-        <option value="dota2">Dota 2</option>
-        <option value="csgo">CS:GO</option>
-        <option value="valorant">Valorant</option>
-      </select>
+  <div class="container">
+
+    <div id="games-view" class="view active">
+      <div class="toolbar">
+        <div class="search-box">
+          <input id="searchInput" type="text" placeholder="Cari game... (contoh: Mobile Legends, Valorant)" />
+        </div>
+      </div>
+      <div class="chip-group" id="platformChips">
+        <button class="chip active" data-platform="">Semua</button>
+        <button class="chip" data-platform="4">PC</button>
+        <button class="chip" data-platform="187">PlayStation 5</button>
+        <button class="chip" data-platform="1">Xbox Series</button>
+        <button class="chip" data-platform="3">iOS</button>
+        <button class="chip" data-platform="21">Android</button>
+        <button class="chip" data-platform="7">Nintendo Switch</button>
+      </div>
+      <p id="gamesStatus" class="status-text">Memuat data game...</p>
+      <div id="gamesGrid" class="grid"></div>
     </div>
-    <div id="matchesStatus" class="loading">Memuat jadwal pertandingan...</div>
-    <div id="matchesList"></div>
+
+    <div id="esports-view" class="view">
+      <div class="esport-pills" id="gamePills">
+        <button class="chip active" data-game="lol">League of Legends</button>
+        <button class="chip" data-game="dota2">Dota 2</button>
+        <button class="chip" data-game="csgo">CS:GO</button>
+        <button class="chip" data-game="valorant">Valorant</button>
+      </div>
+      <div class="chip-group" id="statusPills" style="margin-bottom:18px;">
+        <button class="chip active" data-status="upcoming">Mendatang</button>
+        <button class="chip" data-status="running">Sedang Berlangsung</button>
+        <button class="chip" data-status="past">Selesai</button>
+      </div>
+      <p id="matchesStatus" class="status-text">Memuat jadwal pertandingan...</p>
+      <div id="matchesList" class="match-list"></div>
+    </div>
+
+  </div>
+
+  <div class="modal-overlay" id="gameModal">
+    <div class="modal-box">
+      <div class="modal-inner">
+        <button class="modal-close" id="modalClose">✕</button>
+        <img id="modalImage" src="" alt="" />
+        <div class="modal-body">
+          <h2 id="modalTitle"></h2>
+          <div class="meta-row">
+            <span>⭐ <strong id="modalRating"></strong></span>
+            <span>📅 Rilis: <strong id="modalReleased"></strong></span>
+            <span>🎮 Platform: <strong id="modalPlatforms"></strong></span>
+          </div>
+          <p id="modalDescription">Memuat deskripsi...</p>
+        </div>
+      </div>
+    </div>
   </div>
 
   <script src="app.js"></script>

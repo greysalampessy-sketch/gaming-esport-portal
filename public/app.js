@@ -1,11 +1,5 @@
 const API_BASE = "";
-const FAV_KEY = "favoriteGames";
-
-let currentPlatform = "";
-let currentSearchTerm = "";
-let currentSort = "";
-let currentPage = 1;
-let searchDebounce = null;
+const THEME_KEY = "esportSgaTheme";
 
 let currentGame = "mlbb";
 let currentMatchStatus = "upcoming";
@@ -17,21 +11,30 @@ function escapeHtml(str = "") {
   }[c]));
 }
 
-function getFavorites() {
-  try { return JSON.parse(localStorage.getItem(FAV_KEY)) || {}; }
-  catch { return {}; }
+function getInitials(name = "") {
+  const words = name.trim().split(/\s+/).filter(Boolean);
+  if (words.length === 0) return "?";
+  if (words.length === 1) return words[0].slice(0, 2).toUpperCase();
+  return (words[0][0] + words[1][0]).toUpperCase();
 }
 
-function saveFavorites(favs) {
-  localStorage.setItem(FAV_KEY, JSON.stringify(favs));
+// ---------- DARK MODE ----------
+const themeToggle = document.getElementById("themeToggle");
+
+function applyTheme(theme) {
+  document.documentElement.setAttribute("data-theme", theme);
+  themeToggle.textContent = theme === "dark" ? "☀️" : "🌙";
+  localStorage.setItem(THEME_KEY, theme);
 }
 
-function toggleFavorite(game) {
-  const favs = getFavorites();
-  if (favs[game.id]) delete favs[game.id];
-  else favs[game.id] = { id: game.id, name: game.name, background_image: game.background_image, rating: game.rating, released: game.released };
-  saveFavorites(favs);
-}
+const savedTheme = localStorage.getItem(THEME_KEY)
+  || (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+applyTheme(savedTheme);
+
+themeToggle.addEventListener("click", () => {
+  const current = document.documentElement.getAttribute("data-theme");
+  applyTheme(current === "dark" ? "light" : "dark");
+});
 
 // ---------- TAB SWITCHING ----------
 document.querySelectorAll(".tab-btn").forEach((btn) => {
@@ -43,188 +46,9 @@ document.querySelectorAll(".tab-btn").forEach((btn) => {
     document.querySelectorAll(".view").forEach((v) => v.classList.remove("active"));
     document.getElementById(`${tab}-view`).classList.add("active");
 
-    if (tab === "favorites") renderFavorites();
     if (tab === "teams") loadTeams();
   });
 });
-
-// ---------- GAMES: SEARCH + FILTER + SORT ----------
-const searchInput = document.getElementById("searchInput");
-searchInput.addEventListener("input", (e) => {
-  clearTimeout(searchDebounce);
-  const value = e.target.value.trim();
-  searchDebounce = setTimeout(() => {
-    currentSearchTerm = value;
-    currentPage = 1;
-    loadGames(false);
-  }, 450);
-});
-
-document.getElementById("sortSelect").addEventListener("change", (e) => {
-  currentSort = e.target.value;
-  currentPage = 1;
-  loadGames(false);
-});
-
-document.querySelectorAll("#platformChips .chip").forEach((chip) => {
-  chip.addEventListener("click", () => {
-    document.querySelectorAll("#platformChips .chip").forEach((c) => c.classList.remove("active"));
-    chip.classList.add("active");
-    currentPlatform = chip.dataset.platform;
-    currentPage = 1;
-    loadGames(false);
-  });
-});
-
-document.getElementById("loadMoreBtn").addEventListener("click", () => {
-  currentPage += 1;
-  loadGames(true);
-});
-
-function renderSkeletons(container, count) {
-  container.innerHTML = "";
-  for (let i = 0; i < count; i++) {
-    const sk = document.createElement("div");
-    sk.className = "skeleton";
-    container.appendChild(sk);
-  }
-}
-
-function buildGameCard(game) {
-  const favs = getFavorites();
-  const isFav = !!favs[game.id];
-
-  const card = document.createElement("div");
-  card.className = "card";
-  card.innerHTML = `
-    <div class="thumb">
-      <img src="${game.background_image || ""}" alt="${escapeHtml(game.name)}" loading="lazy" />
-      <span class="rating-badge">★ ${game.rating ?? "-"}</span>
-      <button class="fav-btn ${isFav ? "active" : ""}" title="Favorit">${isFav ? "❤️" : "🤍"}</button>
-    </div>
-    <div class="info">
-      <h3>${escapeHtml(game.name)}</h3>
-      <p>${game.released ? new Date(game.released).getFullYear() : "TBA"} · ${(game.genres || []).map(g => g.name).slice(0,2).join(", ") || "Game"}</p>
-    </div>
-  `;
-  card.querySelector(".fav-btn").addEventListener("click", (e) => {
-    e.stopPropagation();
-    toggleFavorite(game);
-    const btn = e.currentTarget;
-    const nowFav = !!getFavorites()[game.id];
-    btn.classList.toggle("active", nowFav);
-    btn.textContent = nowFav ? "❤️" : "🤍";
-  });
-  card.addEventListener("click", () => openGameModal(game.id));
-  return card;
-}
-
-async function loadGames(append) {
-  const status = document.getElementById("gamesStatus");
-  const grid = document.getElementById("gamesGrid");
-  const loadMoreBtn = document.getElementById("loadMoreBtn");
-
-  if (!append) {
-    status.textContent = "Memuat data game...";
-    renderSkeletons(grid, 8);
-  } else {
-    loadMoreBtn.textContent = "Memuat...";
-    loadMoreBtn.disabled = true;
-  }
-
-  try {
-    const params = new URLSearchParams();
-    if (currentSearchTerm) params.set("search", currentSearchTerm);
-    if (currentPlatform) params.set("platforms", currentPlatform);
-    if (currentSort) params.set("ordering", currentSort);
-    params.set("page", currentPage);
-
-    const res = await fetch(`${API_BASE}/api/games?${params.toString()}`);
-    const data = await res.json();
-
-    if (!data.results || data.results.length === 0) {
-      if (!append) {
-        grid.innerHTML = `<div class="empty-state"><div class="icon">🔍</div>Tidak ada game ditemukan untuk filter ini.</div>`;
-      }
-      status.textContent = "Tidak ada hasil tambahan.";
-      loadMoreBtn.style.display = "none";
-      return;
-    }
-
-    status.textContent = append
-      ? `Menampilkan lebih banyak game (halaman ${currentPage})`
-      : `Menampilkan ${data.results.length} game`;
-
-    if (!append) grid.innerHTML = "";
-    data.results.forEach((game) => grid.appendChild(buildGameCard(game)));
-
-    loadMoreBtn.style.display = data.next ? "inline-block" : "none";
-    loadMoreBtn.textContent = "Muat Lebih Banyak";
-    loadMoreBtn.disabled = false;
-  } catch (err) {
-    status.textContent = "Gagal memuat data game.";
-    if (!append) grid.innerHTML = "";
-    console.error(err);
-  }
-}
-
-// ---------- FAVORITES ----------
-function renderFavorites() {
-  const grid = document.getElementById("favoritesGrid");
-  const status = document.getElementById("favoritesStatus");
-  const favs = Object.values(getFavorites());
-
-  if (favs.length === 0) {
-    grid.innerHTML = `<div class="empty-state"><div class="icon">⭐</div>Belum ada game favorit. Klik ikon hati pada card game untuk menambahkan.</div>`;
-    status.textContent = "";
-    return;
-  }
-
-  status.textContent = `${favs.length} game favorit`;
-  grid.innerHTML = "";
-  favs.forEach((game) => grid.appendChild(buildGameCard(game)));
-}
-
-// ---------- GAME DETAIL MODAL ----------
-const modal = document.getElementById("gameModal");
-const modalImage = document.getElementById("modalImage");
-const modalTitle = document.getElementById("modalTitle");
-const modalRating = document.getElementById("modalRating");
-const modalReleased = document.getElementById("modalReleased");
-const modalPlatforms = document.getElementById("modalPlatforms");
-const modalDescription = document.getElementById("modalDescription");
-
-async function openGameModal(id) {
-  modal.classList.add("active");
-  modalTitle.textContent = "Memuat...";
-  modalImage.src = "";
-  modalRating.textContent = "-";
-  modalReleased.textContent = "-";
-  modalPlatforms.textContent = "-";
-  modalDescription.textContent = "Memuat deskripsi...";
-
-  try {
-    const res = await fetch(`${API_BASE}/api/games/${id}`);
-    const game = await res.json();
-
-    modalImage.src = game.background_image || "";
-    modalTitle.textContent = game.name || "Tanpa nama";
-    modalRating.textContent = `${game.rating ?? "-"} / 5`;
-    modalReleased.textContent = game.released || "TBA";
-    modalPlatforms.textContent = (game.platforms || []).map(p => p.platform.name).join(", ") || "-";
-
-    const desc = (game.description_raw || "Tidak ada deskripsi tersedia.").slice(0, 500);
-    modalDescription.textContent = desc + (game.description_raw && game.description_raw.length > 500 ? "..." : "");
-  } catch (err) {
-    modalTitle.textContent = "Gagal memuat detail";
-    modalDescription.textContent = "";
-    console.error(err);
-  }
-}
-
-document.getElementById("modalClose").addEventListener("click", () => modal.classList.remove("active"));
-modal.addEventListener("click", (e) => { if (e.target === modal) modal.classList.remove("active"); });
-document.addEventListener("keydown", (e) => { if (e.key === "Escape") modal.classList.remove("active"); });
 
 // ---------- ESPORTS: MATCHES ----------
 document.querySelectorAll("#gamePills .chip").forEach((chip) => {
@@ -245,11 +69,33 @@ document.querySelectorAll("#statusPills .chip").forEach((chip) => {
   });
 });
 
+function renderTeamLogo(opponent, sizeClass) {
+  const name = opponent?.name || "TBD";
+  const logo = opponent?.image_url;
+  const initials = getInitials(name);
+
+  if (!logo) {
+    return `<span class="${sizeClass === "lg" ? "team-avatar-lg" : "team-avatar"}">${initials}</span>`;
+  }
+
+  const imgClass = sizeClass === "lg" ? "team-logo-lg" : "team-logo";
+  const fallbackClass = sizeClass === "lg" ? "team-avatar-lg" : "team-avatar";
+  const uid = `fallback-${Math.random().toString(36).slice(2, 9)}`;
+
+  return `
+    <span class="${imgClass}" style="display:inline-flex;align-items:center;justify-content:center;overflow:hidden;">
+      <img src="${logo}" alt="${escapeHtml(name)}" class="${imgClass}"
+        style="width:100%;height:100%;object-fit:cover;"
+        onerror="this.closest('span').outerHTML = document.getElementById('${uid}').innerHTML;" />
+    </span>
+    <template id="${uid}"><span class="${fallbackClass}">${initials}</span></template>
+  `;
+}
+
 function renderMatchTeam(opponent, score, isWinner) {
   const name = opponent?.name || "TBD";
-  const logo = opponent?.image_url || "";
   return `
-    ${logo ? `<img src="${logo}" alt="${escapeHtml(name)}" />` : ""}
+    ${renderTeamLogo(opponent, "sm")}
     <span>${escapeHtml(name)}</span>
     ${score !== null && score !== undefined ? `<span class="team-score">${score}</span>` : ""}
     ${isWinner ? '<span class="winner-badge">MENANG</span>' : ""}
@@ -347,7 +193,7 @@ async function loadTeams() {
       const card = document.createElement("div");
       card.className = "team-card";
       card.innerHTML = `
-        <img src="${team.image_url || ""}" alt="${escapeHtml(team.name)}" onerror="this.style.display='none'" />
+        ${renderTeamLogo(team, "lg")}
         <h4>${escapeHtml(team.name || "Tanpa nama")}</h4>
         <p>${escapeHtml(team.location || team.acronym || "")}</p>
       `;
@@ -360,6 +206,4 @@ async function loadTeams() {
   }
 }
 
-loadGames(false);
 loadMatches();
-

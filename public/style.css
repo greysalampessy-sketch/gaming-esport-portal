@@ -151,11 +151,16 @@ body {
 
 .match-teams { display: flex; align-items: center; gap: 10px; font-weight: 600; font-size: 14px; flex-wrap: wrap; }
 
+.team-logo-wrap {
+  position: relative;
+  width: 26px; height: 26px;
+  flex-shrink: 0;
+}
+
 .team-logo {
   width: 26px; height: 26px; border-radius: 50%;
   object-fit: cover; background: var(--panel-2);
   border: 1px solid var(--border);
-  flex-shrink: 0;
 }
 
 .team-avatar {
@@ -207,9 +212,15 @@ body {
 }
 .team-card:hover { transform: translateY(-4px); box-shadow: var(--shadow); }
 
+.team-card .team-logo-wrap-lg {
+  position: relative;
+  width: 56px; height: 56px;
+  margin: 0 auto 10px;
+}
+
 .team-card .team-logo-lg {
   width: 56px; height: 56px; object-fit: contain;
-  margin-bottom: 10px; border-radius: 50%;
+  border-radius: 50%;
   background: var(--panel-2);
 }
 
@@ -232,3 +243,5 @@ body {
   .match-card { flex-direction: column; align-items: flex-start; }
   .match-meta { text-align: left; }
 }
+
+

@@ -73,22 +73,20 @@ function renderTeamLogo(opponent, sizeClass) {
   const name = opponent?.name || "TBD";
   const logo = opponent?.image_url;
   const initials = getInitials(name);
+  const wrapClass = sizeClass === "lg" ? "team-logo-wrap-lg" : "team-logo-wrap";
+  const avatarClass = sizeClass === "lg" ? "team-avatar-lg" : "team-avatar";
+  const imgClass = sizeClass === "lg" ? "team-logo-lg" : "team-logo";
 
   if (!logo) {
-    return `<span class="${sizeClass === "lg" ? "team-avatar-lg" : "team-avatar"}">${initials}</span>`;
+    return `<span class="${avatarClass}">${initials}</span>`;
   }
 
-  const imgClass = sizeClass === "lg" ? "team-logo-lg" : "team-logo";
-  const fallbackClass = sizeClass === "lg" ? "team-avatar-lg" : "team-avatar";
-  const uid = `fallback-${Math.random().toString(36).slice(2, 9)}`;
-
   return `
-    <span class="${imgClass}" style="display:inline-flex;align-items:center;justify-content:center;overflow:hidden;">
-      <img src="${logo}" alt="${escapeHtml(name)}" class="${imgClass}"
-        style="width:100%;height:100%;object-fit:cover;"
-        onerror="this.closest('span').outerHTML = document.getElementById('${uid}').innerHTML;" />
+    <span class="${wrapClass}">
+      <img src="${logo}" alt="${escapeHtml(name)}" class="${imgClass}" referrerpolicy="no-referrer"
+        onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+      <span class="${avatarClass}" style="display:none;">${initials}</span>
     </span>
-    <template id="${uid}"><span class="${fallbackClass}">${initials}</span></template>
   `;
 }
 
@@ -207,3 +205,4 @@ async function loadTeams() {
 }
 
 loadMatches();
+
